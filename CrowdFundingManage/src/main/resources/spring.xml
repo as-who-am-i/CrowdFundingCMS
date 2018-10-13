@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd ">
+
+
+    <!--1、搭建框架-->
+
+    <import resource="spring-task.xml"></import>
+
+    <!--2、扫描com包下面的注解-->
+    <context:component-scan base-package="com">
+        <!--让父容器根据注解 不加载controller层的文件-->
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"></context:exclude-filter>
+        <!--让父容器另加载的文件-->
+        <!--<context:include-filter type="" expression=""></context:include-filter>-->
+    </context:component-scan>
+
+    <!--3、连接数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/crowdfunding_cms"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="902717"></property>
+    </bean>
+    <!--3.*、配置分布式数据源-->
+
+    <!--4、将数据源注入session工厂-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!--<property name="configLocation" value="classpath:spring-mvc.xml"></property>-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+
+    <!--5、mybatis.spring.mapper.MapperScannerConfigurer这个类自动映射dao层所有的接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+        <property name="basePackage" value="com.dao"></property>
+    </bean>
+
+    <!--6、设置事务管理器，将数据源注入给事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--7、设置注解启动-->
+
+    <tx:annotation-driven></tx:annotation-driven>
+
+</beans>

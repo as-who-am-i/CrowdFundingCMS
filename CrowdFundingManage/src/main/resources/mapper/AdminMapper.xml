@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dao.AdminDao">
+    <select id="findRolesById" resultType="java.lang.String">
+        select
+        m.name
+        from
+        admin l,role m, admin_role r
+        where
+        l.id=#{id}
+        and l.id=r.admin_id
+        and m.id=r.role_id
+    </select>
+
+</mapper>
